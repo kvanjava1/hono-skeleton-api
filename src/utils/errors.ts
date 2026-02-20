@@ -1,0 +1,47 @@
+import { HTTP_STATUS, MESSAGES } from '../configs/constants.ts';
+
+/**
+ * Base Application Error
+ */
+export class AppError extends Error {
+    constructor(
+        message: string,
+        public statusCode: number = HTTP_STATUS.INTERNAL_SERVER_ERROR,
+        public isOperational: boolean = true
+    ) {
+        super(message);
+        this.name = this.constructor.name;
+        Error.captureStackTrace(this, this.constructor);
+    }
+}
+
+export class ValidationError extends AppError {
+    constructor(message: string = MESSAGES.VALIDATION_ERROR) {
+        super(message, HTTP_STATUS.BAD_REQUEST);
+    }
+}
+
+export class NotFoundError extends AppError {
+    constructor(message: string = MESSAGES.USER_NOT_FOUND) {
+        super(message, HTTP_STATUS.NOT_FOUND);
+    }
+}
+
+export class DatabaseError extends AppError {
+    constructor(message: string = MESSAGES.DATABASE_ERROR) {
+        super(message, HTTP_STATUS.INTERNAL_SERVER_ERROR);
+    }
+}
+
+export class ConflictError extends AppError {
+    constructor(message: string) {
+        super(message, HTTP_STATUS.BAD_REQUEST);
+    }
+}
+
+export class DuplicateOrderError extends AppError {
+    constructor(orderId: string) {
+        // 409 Conflict is the standard for duplicates
+        super(`Order with ID ${orderId} has already been processed`, 409);
+    }
+}
