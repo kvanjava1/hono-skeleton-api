@@ -3,7 +3,7 @@ import { HTTP_STATUS, MESSAGES } from '../configs/constants.ts';
 import { errorResponse } from '../utils/response.ts';
 import { logger } from '../utils/logger.ts';
 import { configApp } from '../configs/index.ts';
-import { AppError, ConflictError, ValidationError } from '../utils/errors.ts';
+import { AppError, ConflictError, ValidationError, InvalidTokenError } from '../utils/errors.ts';
 
 /**
  * Transforms external/driver errors into Unified AppErrors
@@ -24,6 +24,19 @@ const transformError = (err: any): Error => {
     return new ValidationError(err.message);
   }
 
+  // JWT Errors (Hono library errors)
+  if (err.name === 'JwtTokenSignatureMismatched' || err.message?.includes('signature mismatched')) {
+    return new InvalidTokenError('The security token signature is invalid. Please generate a new token.');
+  }
+
+  if (err.name === 'JwtTokenExpired') {
+    return new InvalidTokenError('M2M Token has expired. Please generate a new one.');
+  }
+
+  if (err.name === 'JwtTokenInvalid') {
+    return new InvalidTokenError('Invalid M2M Token. Please check your credentials.');
+  }
+
   return err;
 };
 
@@ -41,9 +54,10 @@ export const errorHandler = async (err: Error, c: Context): Promise<Response> =>
     path: c.req.path
   });
 
-  // 3. Handle Unified AppErrors (Operational)
-  if (error instanceof AppError) {
-    return errorResponse(c, error.message, error.statusCode);
+  // 3. Handle Unified AppErrors or any error with a statusCode (Operational)
+  const statusCode = (error as any).statusCode;
+  if (statusCode && typeof statusCode === 'number') {
+    return errorResponse(c, error.message, statusCode);
   }
 
   // 4. Handle System/Unknown Errors (The Mask)
@@ -56,11 +70,11 @@ export const errorHandler = async (err: Error, c: Context): Promise<Response> =>
 /**
  * Middleware Wrapper
  */
-export const errorMiddleware = async (c: Context, next: Next): Promise<void> => {
+export const errorMiddleware = async (c: Context, next: Next): Promise<Response | void> => {
   try {
-    await next();
+    return await next();
   } catch (err) {
     const error = err instanceof Error ? err : new Error(String(err));
-    await errorHandler(error, c);
+    return await errorHandler(error, c);
   }
 };

@@ -24,7 +24,7 @@ export const createSqliteConnection = (): Database => {
   ensureDirectoryExists(configSqlite.dbPath);
   db = new Database(configSqlite.dbPath);
   db.run('PRAGMA journal_mode = WAL');
-  db.run('PRAGMA busy_timeout = 10000'); // Wait up to 5 seconds if the DB is locked
+  db.run('PRAGMA busy_timeout = 10000'); // Wait up to 10 seconds if the DB is locked
 
   logger.info(`SQLite connected to ${configSqlite.dbPath}`);
   return db;

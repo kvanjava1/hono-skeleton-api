@@ -15,7 +15,12 @@ export const createRedisConnection = (): Redis => {
         redis = new Redis({
             host: configRedis.host,
             port: configRedis.port,
+            maxRetriesPerRequest: 1,
             retryStrategy: (times) => {
+                if (times > 1) {
+                    logger.error(`Redis reconnection failed after ${times - 1} attempts. Stopping.`);
+                    return null;
+                }
                 const delay = Math.min(times * 50, 2000);
                 return delay;
             },

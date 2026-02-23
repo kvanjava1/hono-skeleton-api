@@ -33,11 +33,11 @@ export const configApp = {
   isDevelopment: process.env.NODE_ENV !== 'production',
   isProduction: process.env.NODE_ENV === 'production',
   db: {
-    mongo: getEnvBool('DB_MONGO_ENABLED', true),
-    mysql: getEnvBool('DB_MYSQL_ENABLED', true),
-    pg: getEnvBool('DB_PG_ENABLED', true),
-    sqlite: getEnvBool('DB_SQLITE_ENABLED', true),
-    redis: getEnvBool('DB_REDIS_ENABLED', true),
+    mongo: getEnvBool('DB_MONGO_ENABLED', false),
+    mysql: getEnvBool('DB_MYSQL_ENABLED', false),
+    pg: getEnvBool('DB_PG_ENABLED', false),
+    sqlite: getEnvBool('DB_SQLITE_ENABLED', false),
+    redis: getEnvBool('DB_REDIS_ENABLED', false),
   }
 };
 
@@ -85,6 +85,11 @@ export const configCors = {
   origin: getEnv('CORS_ORIGIN', '*'),
 };
 
+export const configJwt = {
+  secret: getEnv('JWT_SECRET', 'your-super-secret-key'),
+  expiresIn: getEnv('JWT_EXPIRES_IN', '1h'),
+};
+
 export const configPg = {
   host: getEnv('PG_HOST', 'localhost'),
   port: getEnvNumber('PG_PORT', 5432),
@@ -102,3 +107,4 @@ export type ConfigSqlite = typeof configSqlite;
 export type ConfigRateLimiter = typeof configRateLimiter;
 export type ConfigCors = typeof configCors;
 export type ConfigQueue = typeof configQueue;
+export type ConfigJwt = typeof configJwt;

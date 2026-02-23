@@ -23,9 +23,9 @@ const cleanupStore = (): void => {
 setInterval(cleanupStore, 60000);
 
 export const rateLimiterMiddleware = async (c: Context, next: Next): Promise<void | Response> => {
-  const ip = c.req.header('x-forwarded-for') || 
-             c.req.header('x-real-ip') || 
-             'unknown';
+  const ip = c.req.header('x-forwarded-for') ||
+    c.req.header('x-real-ip') ||
+    'unknown';
 
   const now = Date.now();
   const windowMs = configRateLimiter.windowMs;
@@ -41,12 +41,12 @@ export const rateLimiterMiddleware = async (c: Context, next: Next): Promise<voi
   } else if (record.count >= maxRequests) {
     const retryAfter = Math.ceil((record.resetTime - now) / 1000);
     logger.warn(`Rate limit exceeded for IP: ${ip}`);
-    
+
     c.header('Retry-After', String(retryAfter));
     c.header('X-RateLimit-Limit', String(maxRequests));
     c.header('X-RateLimit-Remaining', '0');
     c.header('X-RateLimit-Reset', String(record.resetTime));
-    
+
     return errorResponse(c, MESSAGES.RATE_LIMIT_EXCEEDED, HTTP_STATUS.TOO_MANY_REQUESTS);
   } else {
     record.count++;

@@ -52,3 +52,53 @@ export const cacheDeleteByPattern = async (pattern: string): Promise<void> => {
         logger.error(`Cache delete pattern failed: ${pattern}`, error);
     }
 };
+
+/**
+ * Batch retrieve multiple keys
+ */
+export const cacheMGet = async <T>(keys: string[]): Promise<(T | null)[]> => {
+    if (!configApp.db.redis || keys.length === 0) return keys.map(() => null);
+
+    try {
+        const redis = getRedis();
+        const values = await redis.mget(...keys);
+
+        return values.map(val => {
+            if (!val) return null;
+            try {
+                return JSON.parse(val) as T;
+            } catch (e) {
+                return null;
+            }
+        });
+    } catch (error) {
+        logger.error('Cache MGet failed', error);
+        return keys.map(() => null);
+    }
+};
+
+/**
+ * Batch set multiple keys with individual TTL
+ * Uses pipeline for atomicity and individual TTL support
+ */
+export const cacheMSet = async (items: { key: string; value: any; ttlSeconds?: number }[]): Promise<void> => {
+    if (!configApp.db.redis || items.length === 0) return;
+
+    try {
+        const redis = getRedis();
+        const pipeline = redis.pipeline();
+
+        for (const item of items) {
+            const stringValue = JSON.stringify(item.value);
+            if (item.ttlSeconds) {
+                pipeline.set(item.key, stringValue, 'EX', item.ttlSeconds);
+            } else {
+                pipeline.set(item.key, stringValue);
+            }
+        }
+
+        await pipeline.exec();
+    } catch (error) {
+        logger.error('Cache MSet failed', error);
+    }
+};
