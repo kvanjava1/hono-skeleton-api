@@ -13,6 +13,14 @@ Before you begin, make sure you have the following installed:
 2.  **Redis**: Required for the background queue system.
     - [Install Redis](https://redis.io/docs/getting-started/) (Make sure it is running!)
 
+## 💻 Tech Stack
+
+- **Runtime**: Bun `v1.3.9`
+- **Framework**: Hono `v4.6.0`
+- **Queue System**: BullMQ `v5.69.3`
+- **Redis Client**: ioredis `v5.9.3`
+- **Validation**: Zod `v4.3.6`
+
 ---
 
 ## 🚀 Step-by-Step Setup

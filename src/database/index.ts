@@ -38,17 +38,39 @@ export {
 import { configApp } from '../configs/index.ts';
 
 export const connectAllDatabases = async (): Promise<void> => {
-  const { createMysqlPool } = await import('./mysql.connection.ts');
+  const { createMysqlPool, testMysqlConnection } = await import('./mysql.connection.ts');
   const { connectMongo } = await import('./mongo.connection.ts');
-  const { createPgConnection } = await import('./pg.connection.ts');
-  const { createRedisConnection } = await import('./redis.connection.ts');
-  const { createSqliteConnection } = await import('./sqlite.connection.ts');
+  const { createPgConnection, testPgConnection } = await import('./pg.connection.ts');
+  const { createRedisConnection, testRedisConnection } = await import('./redis.connection.ts');
+  const { createSqliteConnection, testSqliteConnection } = await import('./sqlite.connection.ts');
 
-  if (configApp.db.mysql) createMysqlPool();
-  if (configApp.db.mongo) await connectMongo();
-  if (configApp.db.pg) createPgConnection();
-  if (configApp.db.redis) createRedisConnection();
-  if (configApp.db.sqlite) createSqliteConnection();
+  if (configApp.db.mysql) {
+    createMysqlPool();
+    const isOk = await testMysqlConnection();
+    if (!isOk) throw new Error('MySQL connection failed during startup');
+  }
+
+  if (configApp.db.mongo) {
+    await connectMongo();
+  }
+
+  if (configApp.db.pg) {
+    createPgConnection();
+    const isOk = await testPgConnection();
+    if (!isOk) throw new Error('PostgreSQL connection failed during startup');
+  }
+
+  if (configApp.db.redis) {
+    createRedisConnection();
+    const isOk = await testRedisConnection();
+    if (!isOk) throw new Error('Redis connection failed during startup');
+  }
+
+  if (configApp.db.sqlite) {
+    createSqliteConnection();
+    const isOk = testSqliteConnection();
+    if (!isOk) throw new Error('SQLite connection failed during startup');
+  }
 };
 
 export const disconnectAllDatabases = async (): Promise<void> => {

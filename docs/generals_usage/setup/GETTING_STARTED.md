@@ -5,9 +5,12 @@ Welcome to the **Multi-Database Hono API** template. This project is a productio
 ## 🚀 Prerequisites
 
 Before you begin, ensure you have the following installed:
-- [Bun](https://bun.sh/) (v1.0 or higher)
+- [Bun](https://bun.sh/) (**v1.3.9** or higher)
 - [Docker](https://www.docker.com/) (Recommended for running databases locally)
 - Access to your target databases (MySQL, MongoDB, PostgreSQL, or Redis)
+
+## 💻 Tech Stack
+- **Bun** `v1.3.9` | **Hono** `v4.6.0` | **BullMQ** `v5.69.3` | **Zod** `v4.3.6`
 
 ---
 

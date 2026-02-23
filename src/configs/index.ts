@@ -7,7 +7,7 @@ const getEnv = (key: string, defaultValue?: string): string => {
 };
 
 const getEnvNumber = (key: string, defaultValue?: number): number => {
-  const stringValue = process.env[key];
+  const stringValue = process.env[key]?.trim();
   if (stringValue === undefined) {
     if (defaultValue === undefined) {
       throw new Error(`Environment variable ${key} is required`);
@@ -22,9 +22,9 @@ const getEnvNumber = (key: string, defaultValue?: number): number => {
 };
 
 const getEnvBool = (key: string, defaultValue: boolean): boolean => {
-  const value = process.env[key];
+  const value = process.env[key]?.trim().toLowerCase();
   if (value === undefined) return defaultValue;
-  return value === 'true';
+  return value === 'true' || value === '1' || value === 'yes';
 };
 
 export const configApp = {
