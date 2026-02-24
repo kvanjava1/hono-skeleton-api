@@ -7,9 +7,13 @@ import { m2mAuthMiddleware } from '../middlewares/m2mAuth.middleware.ts';
 export const registerAllRoutes = (app: Hono) => {
   const api = new Hono();
 
-  // Apply both middlewares to ALL /api routes
-  // Using '/*' because this router is already mounted at '/api'
-  api.use('/*', m2mLoggerMiddleware, m2mAuthMiddleware);
+  // 1. Logger applies to ALL /api routes
+  api.use('/*', m2mLoggerMiddleware);
+
+  // 2. Auth applies to everything EXCEPT token generation
+  // We apply it here to the 'api' instance, but excluding the /m2m/token path
+  api.use('/m2m/me', m2mAuthMiddleware);
+  api.use('/tiktok/*', m2mAuthMiddleware);
 
   registerAuthRoutes(api);
   registerTiktokRoutes(api);

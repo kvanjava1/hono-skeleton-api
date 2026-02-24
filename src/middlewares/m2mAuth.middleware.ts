@@ -11,10 +11,6 @@ export const m2mAuthMiddleware = async (c: Context, next: Next) => {
     const path = c.req.path;
     logger.info(`[m2mAuth] Incoming path: "${path}"`);
 
-    if (path.includes('/token')) {
-        return await next();
-    }
-
     const authHeader = c.req.header('Authorization');
 
     if (!authHeader || !authHeader.startsWith('Bearer ')) {

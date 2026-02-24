@@ -88,7 +88,8 @@ const triggerCallback = async (requestId: string, url: string, retryCount = 0) =
                     created_at: requestData.created_at,
                     result: JSON.parse(requestData.result || '[]')
                 }
-            })
+            }),
+            signal: AbortSignal.timeout(10000) // 10 second timeout
         });
 
         const responseText = await response.text();

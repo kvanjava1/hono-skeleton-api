@@ -17,11 +17,18 @@ export const m2mLoggerMiddleware = async (c: Context, next: Next) => {
 
     // 2. POST-CAPTURE: Response Body
     let responseBody = null;
-    try {
-        const res = c.res.clone();
-        responseBody = await res.text();
-    } catch (e) {
-        // Silently fail
+    const contentLength = parseInt(c.res.headers.get('content-length') || '0');
+
+    // Only capture response body if it's reasonably small (e.g., < 100KB)
+    if (contentLength < 102400) {
+        try {
+            const res = c.res.clone();
+            responseBody = await res.text();
+        } catch (e) {
+            // Silently fail
+        }
+    } else {
+        responseBody = '[Response body too large to log]';
     }
 
     // 3. LOGGING

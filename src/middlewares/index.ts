@@ -5,10 +5,12 @@ import { configCors } from "../configs/index.ts";
 import { errorHandler } from "./errorHandler.ts";
 import { rateLimiterMiddleware } from "./rateLimiter.ts";
 import { requestLoggerMiddleware } from "./logger.ts";
+import { jsonOnlyMiddleware } from "./jsonOnly.middleware.ts";
 
 export { errorHandler } from "./errorHandler.ts";
 export { rateLimiterMiddleware } from "./rateLimiter.ts";
 export { requestLoggerMiddleware } from "./logger.ts";
+export { jsonOnlyMiddleware } from "./jsonOnly.middleware.ts";
 
 export const setupMiddlewares = (app: Hono) => {
   app.use(
@@ -21,6 +23,7 @@ export const setupMiddlewares = (app: Hono) => {
   );
 
   app.use("*", secureHeaders());
+  app.use("*", jsonOnlyMiddleware);
   app.use("*", rateLimiterMiddleware);
   app.use("*", requestLoggerMiddleware);
 
