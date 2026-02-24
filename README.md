@@ -1,3 +1,3 @@
-# 📖 TikTok Info API Documentation: Start Here
+# 📖 TikTok Info API
 
-Dont forget to read docs/tiktok_info_api
+Do not forget to read docs/tiktok_info_api
